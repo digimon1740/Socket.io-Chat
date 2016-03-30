@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font: 13px Helvetica, Arial;
+        }
+
+        form {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        form input#nickname {
+            border: 0;
+            padding: 10px;
+            width: 18%;
+            margin-right: .5%;
+        }
+
+        form input#m {
+            border: 0;
+            padding: 10px;
+            width: 70%;
+            margin-right: .5%;
+        }
+
+        form button {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages li {
+            padding: 5px 10px;
+        }
+
+        #messages li:nth-child(odd) {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+<ul id="messages"></ul>
+<form action="">
+    <input type="text" id="nickname" placeholder="닉네임을 입력하여 주세요"/>
+    <input id="m" autocomplete="off"/>
+    <button>Send</button>
+</form>
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+    var socket = io();
+    $('#nickname').keydown(function (event) {
+        if (event.which == 13) {
+            socket.emit('set nickname', $(this).val());
+            return false;
+        }
+    });
+    $('#m').keydown(function (event) {
+        if (event.which == 13) {
+            socket.emit('chat message', $('#nickname').val()+' 의 말 : '+$(this).val());
+            $(this).val('');
+            return false;
+        }
+    });
+    socket.on('join user', function(nickname) {
+        $('#messages').append($('<li>').text(nickname + ' 사용자가 접속하셨습니다'));
+    });
+    socket.on('chat message', function (msg) {
+        $('#messages').append($('<li>').text(msg));
+    });
+</script>
+</body>
+</html>
